@@ -34,7 +34,6 @@ function libelleJour(j) {
   if (j.st === 'abs') return { c: 'abs', t: '📩 Absence annoncée' + x };
   if (j.st === 'nja') return { c: 'nja', t: '⚠️ Absence non annoncée · −' + (j.pen || 1) + ' pt' + ((j.pen || 1) > 1 ? 's' : '') };
   if (j.st === 'off') return { c: 'off', t: '🏖 Pas prévu (ne compte pas)' };
-  if (n > 0 && !j.coche && j.key <= D.aujourdhui && j.key >= D.points.cfg.debut) return { c: 'prec', t: '❓ Pas coché : touche la date pour préciser' };
   if (j.cr !== '' && j.cr !== undefined) return { c: 'info', t: n + ' créneau' + (n > 1 ? 'x' : '') + ' ce jour' };
   return null;
 }
@@ -76,8 +75,8 @@ function majPoints(P) {
     var s = P.semaines[b.dataset.l];
     b.style.visibility = s ? 'visible' : 'hidden';
     if (s) {
-      b.textContent = (s.nonPrecis ? '❓ ' : '') + signe(s.pts) + ' pt' + (Math.abs(s.pts) > 1 ? 's' : '') + (s.enCours ? ' · en cours' : '');
-      b.classList.toggle('neg', s.pts < 0); b.classList.toggle('aprec', !!s.nonPrecis);
+      b.textContent = signe(s.pts) + ' pt' + (Math.abs(s.pts) > 1 ? 's' : '') + (s.enCours ? ' · en cours' : '');
+      b.classList.toggle('neg', s.pts < 0);
     }
     var ed = $('ed' + b.dataset.l);
     if (ed && ed.classList.contains('vis')) remplirEd(ed, b.dataset.l);
@@ -99,7 +98,6 @@ function remplirEd(ed, l) {
     (s.ret ? '<span class="m">−' + s.ret + ' retard' + (s.ret > 1 ? 's' : '') + '</span>' : '') +
     (s.penAbs ? '<span class="m">−' + s.penAbs + ' absence</span>' : '') +
     '<span class="tot">= ' + signe(s.pts) + '</span></div>';
-  if (s.nonPrecis) h += '<p class="warn">❓ ' + pl(s.nonPrecis, 'créneau') + ' pas coché' + (s.nonPrecis > 1 ? 's' : '') + ' sans explication : touche la date du jour pour dire ce qui s’est passé (absence, remplacement, pas prévu…).</p>';
   if (!s.bonus && s.prev > 0 && !s.rempl && nb < s.prev) h += '<p class="g">Bonus : il faut faire les ' + s.prev + ' créneaux prévus.</p>';
   if (s.rempl) h += '<p class="g">Bonus perdu à cause du remplacement (règle).</p>';
   if (s.ancien) h += '<p class="g">Cette semaine contient une ancienne saisie manuelle. <button class="lien" data-eff="1">Effacer</button></p>';
