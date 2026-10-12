@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Calcul des heures">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8a3a62"/><stop offset="1" stop-color="#5a2340"/>
+    </linearGradient>
+    <clipPath id="tente"><path d="M256 92 L436 300 L76 300 Z"/></clipPath>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- fanion -->
+  <path d="M256 92 V48" stroke="#fde7f0" stroke-width="10" stroke-linecap="round"/>
+  <path d="M260 50 L312 64 L260 80 Z" fill="#f6b26b"/>
+  <!-- chapiteau rayé -->
+  <g clip-path="url(#tente)">
+    <rect x="60" y="80" width="400" height="230" fill="#fde7f0"/>
+    <g fill="#e06c9f">
+      <path d="M256 92 L196 300 L136 300 Z"/><path d="M256 92 L316 300 L256 300 Z"/><path d="M256 92 L436 300 L376 300 Z"/>
+    </g>
+  </g>
+  <path d="M76 300 Q116 330 156 300 Q196 330 236 300 Q276 330 316 300 Q356 330 396 300 Q416 315 436 300" fill="none" stroke="#fde7f0" stroke-width="12" stroke-linecap="round"/>
+  <!-- horloge -->
+  <circle cx="256" cy="330" r="112" fill="#fff8fb" stroke="#f6b26b" stroke-width="14"/>
+  <g stroke="#b0527f" stroke-width="10" stroke-linecap="round">
+    <path d="M256 236 v16"/><path d="M256 408 v16"/><path d="M162 330 h16"/><path d="M334 330 h16"/>
+  </g>
+  <path d="M256 330 L256 268" stroke="#5a2340" stroke-width="16" stroke-linecap="round"/>
+  <path d="M256 330 L304 352" stroke="#5a2340" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="256" cy="330" r="13" fill="#f6b26b"/>
+</svg>
