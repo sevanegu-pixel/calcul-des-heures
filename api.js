@@ -6,6 +6,15 @@
   function lire(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function ecrire(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { } }
   function $(i) { return document.getElementById(i); }
+  // apparence (thème) mémorisée sur cet appareil
+  var SKINS_OK = { rose: '#ead1dc', nuit: '#2a2130', ocean: '#cfe6f4', foret: '#d5eada', soleil: '#fde3ae', chapiteau: '#c8323c', lavande: '#e4dcf6', encre: '#222222' };
+  window.cdhSkin = function (s) {
+    if (!Object.prototype.hasOwnProperty.call(SKINS_OK, s)) s = 'rose';
+    if (s === 'rose') document.documentElement.removeAttribute('data-skin'); else document.documentElement.setAttribute('data-skin', s);
+    var m = document.querySelector('meta[name=theme-color]'); if (m) m.setAttribute('content', SKINS_OK[s]);
+    ecrire('cdh.skin', s);
+  };
+  window.cdhSkin(lire('cdh.skin') || 'rose');
   var token = lire(K_TOKEN);
   if (token && Number(lire(K_EXP) || 0) < Date.now()) token = null;
 

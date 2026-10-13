@@ -190,12 +190,15 @@ function afficher(d) {
     bloc.appendChild(r);
     var pj = panneauJour(j, r); bloc.appendChild(pj);
     r.querySelector('.date').onclick = function () {
+      if (!ptsActifs()) return;
       var ouvert = pj.classList.contains('vis');
       [].forEach.call(document.querySelectorAll('.dayEd.vis'), function (x) { x.classList.remove('vis'); });
       if (!ouvert) { pj._dessiner(); pj.classList.add('vis'); }
     };
   });
   sem(); totaux(); majPoints(d.points);
+  if (d.points && d.points.cfg.skin && d.points.cfg.skin !== skinActuel()) window.cdhSkin(d.points.cfg.skin);
+  appliquerPts();
   var a = document.querySelector('.auj'); if (a) a.scrollIntoView({ block: 'center' });
 }
 $('mois').onchange = function () { charger(this.value); };
@@ -206,34 +209,80 @@ $('th').onchange = function () {
   google.script.run.withSuccessHandler(fini).withFailureHandler(erreur).appSauverTH(D.label, D.th);
 };
 $('th').oninput = totaux;
-$('reg').onclick = function () {
-  var P = $('panneau');
-  if (!P.classList.contains('vis') && D) {
-    var h = '';
-    ['L', 'M', 'M', 'J', 'V', 'S', 'D'].forEach(function (n, i) {
-      h += '<div><label>' + n + '</label><input type="number" inputmode="decimal" step="0.5" min="0" value="' + (D.defauts[i] === '' ? '' : D.defauts[i]) + '"></div>';
-    });
-    $('defs').innerHTML = h;
-    var sel = $('cat'); sel.innerHTML = '';
-    D.tarif.cats.forEach(function (n) { var o = document.createElement('option'); o.value = n; o.textContent = n; if (n === D.tarif.cat) o.selected = true; sel.appendChild(o); });
-    if (D.url) { $('lien').href = D.url; $('lien').hidden = false; } else $('lien').hidden = true;
-    compte();
-    var PT = D.points, c = '';
-    ['L', 'M', 'M', 'J', 'V', 'S', 'D'].forEach(function (n, i) {
-      c += '<div><label>' + n + '</label><input type="number" inputmode="numeric" min="0" value="' + PT.cfg.cren[i] + '"></div>';
-    });
-    $('cren').innerHTML = c; $('pDeb').value = PT.cfg.debut; $('pDep').value = PT.cfg.depart;
+/* ---------- Apparences ---------- */
+var SKINS = [
+  { v: 'rose', t: 'Rose', c: ['#ead1dc', '#6d2d4d', '#674ea7'] },
+  { v: 'nuit', t: 'Nuit', c: ['#1f1a22', '#e48bb6', '#9b7fe0'] },
+  { v: 'ocean', t: 'Océan', c: ['#cfe6f4', '#1d5c88', '#2b8a9a'] },
+  { v: 'foret', t: 'Forêt', c: ['#d5eada', '#2e6a46', '#7a8f3a'] },
+  { v: 'soleil', t: 'Soleil', c: ['#fde3ae', '#b5601a', '#c0503a'] },
+  { v: 'chapiteau', t: 'Chapiteau', c: ['#c8323c', '#fff8ee', '#d4a017'] },
+  { v: 'lavande', t: 'Lavande', c: ['#e4dcf6', '#5a42a0', '#c0558f'] },
+  { v: 'encre', t: 'Encre', c: ['#222', '#f4f4f4', '#888'] }
+];
+function skinActuel() { return document.documentElement.getAttribute('data-skin') || 'rose'; }
+function dessinerSkins() {
+  var cur = skinActuel(), h = '';
+  SKINS.forEach(function (s) {
+    h += '<button data-skin-v="' + s.v + '" class="' + (s.v === cur ? 'on' : '') + '" aria-pressed="' + (s.v === cur) + '"><span class="ech"><i style="background:' + s.c[0] + '"></i><i style="background:' + s.c[1] + '"></i><i style="background:' + s.c[2] + '"></i></span>' + s.t + '</button>';
+  });
+  $('skins').innerHTML = h;
+  [].forEach.call($('skins').querySelectorAll('button'), function (b) {
+    b.onclick = function () {
+      var v = b.dataset.skinV; window.cdhSkin(v); dessinerSkins(); occupe();
+      google.script.run.withSuccessHandler(function (cfg) { fini(); if (D && D.points) D.points.cfg = cfg; }).withFailureHandler(erreur).appSauverOptions(null, v);
+    };
+  });
+}
+/* ---------- Système de points oui / non ---------- */
+function ptsActifs() { return !D || !D.points || D.points.cfg.actif !== false; }
+function appliquerPts() {
+  var on = ptsActifs();
+  document.body.classList.toggle('sansPts', !on);
+  if ($('ptOn')) {
+    $('ptOn').checked = on; $('ptCfg').hidden = !on;
+    $('ptOnTxt').textContent = on ? 'Activé : les points s’affichent sur l’écran principal.' : 'Désactivé : les points sont cachés. Tes saisies restent enregistrées, tu peux le réactiver quand tu veux.';
   }
-  P.classList.toggle('vis');
+}
+$('ptOn').onchange = function () {
+  var on = this.checked; if (D && D.points) D.points.cfg.actif = on; appliquerPts(); occupe();
+  google.script.run.withSuccessHandler(function (cfg) { fini(); if (D && D.points) D.points.cfg = cfg; appliquerPts(); }).withFailureHandler(erreur).appSauverOptions(on, null);
 };
+/* ---------- Fenêtre Paramètres ---------- */
+function ouvrirReg() {
+  if (!D) return;
+  var h = '';
+  ['L', 'M', 'M', 'J', 'V', 'S', 'D'].forEach(function (n, i) {
+    h += '<div><label>' + n + '</label><input type="number" inputmode="decimal" step="0.5" min="0" value="' + (D.defauts[i] === '' ? '' : D.defauts[i]) + '"></div>';
+  });
+  $('defs').innerHTML = h;
+  var sel = $('cat'); sel.innerHTML = '';
+  D.tarif.cats.forEach(function (n) { var o = document.createElement('option'); o.value = n; o.textContent = n; if (n === D.tarif.cat) o.selected = true; sel.appendChild(o); });
+  if (D.url) { $('lien').href = D.url; $('lien').hidden = false; } else $('lien').hidden = true;
+  compte();
+  var PT = D.points, c = '';
+  ['L', 'M', 'M', 'J', 'V', 'S', 'D'].forEach(function (n, i) {
+    c += '<div><label>' + n + '</label><input type="number" inputmode="numeric" min="0" value="' + PT.cfg.cren[i] + '"></div>';
+  });
+  $('cren').innerHTML = c; $('pDeb').value = PT.cfg.debut; $('pDep').value = PT.cfg.depart;
+  dessinerSkins(); appliquerPts();
+  $('fenetre').hidden = false; document.body.classList.add('modale');
+  $('panneau').scrollTop = 0; $('fermer').focus();
+}
+function fermerReg() { $('fenetre').hidden = true; document.body.classList.remove('modale'); }
+$('reg').onclick = ouvrirReg;
+$('fermer').onclick = fermerReg;
+$('fenetre').onclick = function (e) { if (e.target === this) fermerReg(); };
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('fenetre').hidden) fermerReg(); });
 $('okDef').onclick = function () {
   var v = [].map.call(document.querySelectorAll('#defs input'), function (i) { var x = String(i.value).replace(',', '.'); return x === '' ? '' : Number(x); });
   occupe();
+  google.script.run.withSuccessHandler(function () { fini(); fermerReg(); charger(D.label); }).withFailureHandler(erreur).appSauverReglages(v, $('cat').value);
+};
+$('okPts').onclick = function () {
   var cr = [].map.call(document.querySelectorAll('#cren input'), function (i) { return Number(i.value) || 0; });
-  google.script.run.withSuccessHandler(function () {
-    google.script.run.withSuccessHandler(function () { fini(); $('panneau').classList.remove('vis'); charger(D.label); })
-      .withFailureHandler(erreur).appSauverPoints($('pDeb').value, $('pDep').value, cr);
-  }).withFailureHandler(erreur).appSauverReglages(v, $('cat').value);
+  occupe();
+  google.script.run.withSuccessHandler(function () { fini(); fermerReg(); charger(D.label); }).withFailureHandler(erreur).appSauverPoints($('pDeb').value, $('pDep').value, cr);
 };
 window.charger = charger;
 
