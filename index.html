@@ -47,7 +47,7 @@
 </div>
 </main>
 <div id="app" hidden>
-<header><div class="titreL"><p class="titre"><img src="favicon-32.png" alt="" width="18" height="18"> <span id="titreNom">Calcul des heures</span></p><button id="reg" aria-label="Paramètres">⚙</button></div><div class="nav"><button id="prec" aria-label="Mois précédent">‹</button><select id="mois"></select><button id="suiv" aria-label="Mois suivant">›</button></div></header>
+<header><div class="titreL"><p class="titre"><img src="favicon-32.png" alt="" width="18" height="18"> <span id="titreNom">Calcul des heures</span></p><span class="hbt"><button id="pdf" aria-label="Décompte PDF" title="Décompte PDF">📄</button><button id="reg" aria-label="Paramètres">⚙</button></span></div><div class="nav"><button id="prec" aria-label="Mois précédent">‹</button><select id="mois"></select><button id="suiv" aria-label="Mois suivant">›</button></div></header>
 <div id="fenetre" hidden role="dialog" aria-modal="true" aria-labelledby="fTitre"><div class="feuille"><div class="fhead"><h2 id="fTitre">⚙ Paramètres</h2><button id="fermer" aria-label="Fermer">✕</button></div><div id="panneau">
 <div class="sect"><h3>🎨 Apparence</h3><p>Le thème change tout de suite.</p><div class="skins" id="skins"></div></div>
 <div class="sect"><h3>Heures par défaut</h3><p>Proposées automatiquement pour chaque jour pas encore saisi.</p><div class="defs" id="defs"></div>
@@ -58,6 +58,13 @@
 <div class="act"><span></span><button id="okPts">Enregistrer les points</button></div></div></div>
 <div class="sect"><h3>Mon compte</h3><p id="moiInfo"></p><div class="pcfg"><label>Code actuel<input type="password" id="pinOld" inputmode="numeric" maxlength="6" autocomplete="current-password"></label><label>Nouveau code<input type="password" id="pinNew" inputmode="numeric" maxlength="6" autocomplete="new-password"></label></div><div class="act"><button class="sec" id="okPin">Changer mon code PIN</button></div><div class="act"><button class="sec" id="deco">Se déconnecter</button><button class="sec" id="decoTout">Déconnecter tous mes appareils</button></div></div>
 <div id="adminBloc" class="sect" hidden><h3>Administration</h3><p>Nouveaux utilisateurs : <select id="admMode"><option value="code">avec code d’invitation</option><option value="ouvert">ouvert à tous</option><option value="ferme">fermé</option></select></p><p>Code d’invitation : <b id="admCode"></b> <button class="lien" id="admNewCode">nouveau code</button></p><div id="admUsers"></div></div>
+</div></div></div>
+<div id="fenPdf" hidden role="dialog" aria-modal="true" aria-labelledby="pTitre"><div class="feuille"><div class="fhead"><h2 id="pTitre">📄 Décompte PDF</h2><button id="fermerPdf" aria-label="Fermer">✕</button></div><div id="corpsPdf">
+<div class="sect"><h3>Période</h3><div class="chips" id="pPer"><button data-per="cur" class="on">Ce mois-ci</button><button data-per="sel">Choisir des mois</button></div><p class="g" id="pCur" style="margin-top:6px"></p><div id="pMoisBloc" hidden><div class="mois" id="pMois"></div><div class="lig"><button class="lien" id="pTous">Tout cocher</button><button class="lien" id="pAucun">Tout décocher</button></div></div></div>
+<div class="sect"><h3>Contenu</h3><div class="chips col" id="pType"><button data-t="tout" class="on">Heures de cours + entraînements libres</button><button data-t="cours">Heures de cours seulement</button><button data-t="ent">Entraînements libres seulement</button></div></div>
+<div class="sect"><label class="bascule"><span>Afficher le taux horaire et le salaire</span><input type="checkbox" id="pMont"></label><label class="bascule" style="margin-top:12px"><span>Détail jour par jour</span><input type="checkbox" id="pDet" checked></label></div>
+<div class="act"><span class="g" id="pEtat"></span><button id="pGo">Créer le PDF</button></div>
+<div id="pRes" hidden class="sect res"><p><b id="pNom"></b></p><div class="act"><button class="sec" id="pOuvrir">Ouvrir</button><button class="sec" id="pPartager">Partager…</button><button id="pDl">Télécharger</button></div></div>
 </div></div></div>
 <div class="resume"><div class="bloc"><div class="lab">Heures</div><div class="val" id="tH">–</div></div><div class="bloc"><div class="lab">T/H (CHF)</div><input id="th" type="number" inputmode="decimal" step="0.05" placeholder="0.00"></div><div class="bloc total"><div class="lab">Total CHF</div><div class="val" id="tM">–</div></div></div>
 <div class="entbar"><div><div class="lab">🤸 Entraînements libres</div><div class="cat" id="eCat"></div></div><div class="v"><b id="eP">–</b><span id="eN"></span></div></div>

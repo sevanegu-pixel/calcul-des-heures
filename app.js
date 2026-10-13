@@ -330,3 +330,63 @@ $('okPin').onclick = function () {
 };
 $('deco').onclick = function () { window.cdhDeconnexion(false); };
 $('decoTout').onclick = function () { if (confirm('Déconnecter tous tes appareils, y compris celui-ci ?')) window.cdhDeconnexion(true); };
+
+/* ---------- Décompte PDF ---------- */
+var PDF = { per: 'cur', t: 'tout', blob: null, nom: '' };
+function lirePrefPdf() { try { return JSON.parse(localStorage.getItem('cdh.pdf') || '{}') || {}; } catch (e) { return {}; } }
+function ecrirePrefPdf() { try { localStorage.setItem('cdh.pdf', JSON.stringify({ t: PDF.t, mont: $('pMont').checked, det: $('pDet').checked })); } catch (e) { } }
+function chipsPdf(id, attr, val) { [].forEach.call($(id).querySelectorAll('button'), function (b) { b.classList.toggle('on', b.dataset[attr] === val); }); }
+function moisCoches() { return [].filter.call($('pMois').querySelectorAll('input'), function (i) { return i.checked; }).map(function (i) { return i.value; }); }
+function majPer() {
+  chipsPdf('pPer', 'per', PDF.per);
+  $('pMoisBloc').hidden = PDF.per !== 'sel';
+  $('pCur').textContent = PDF.per === 'cur' ? 'Mois affiché : ' + D.label : moisCoches().length + ' mois choisi' + (moisCoches().length > 1 ? 's' : '');
+}
+function ouvrirPdf() {
+  if (!D) return;
+  var pr = lirePrefPdf();
+  PDF.t = pr.t || 'tout'; $('pMont').checked = !!pr.mont; $('pDet').checked = pr.det !== false;
+  var h = '';
+  function e(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  D.mois.forEach(function (m) { h += '<label' + (m === D.label ? ' class="on"' : '') + '><input type="checkbox" value="' + e(m) + '"' + (m === D.label ? ' checked' : '') + '>' + e(m.charAt(0) + m.slice(1).toLowerCase()) + '</label>'; });
+  $('pMois').innerHTML = h;
+  [].forEach.call($('pMois').querySelectorAll('input'), function (i) { i.onchange = function () { i.parentNode.classList.toggle('on', i.checked); majPer(); }; });
+  chipsPdf('pType', 't', PDF.t); majPer();
+  $('pRes').hidden = true; $('pEtat').textContent = ''; $('pGo').disabled = false;
+  $('fenPdf').hidden = false; document.body.classList.add('modale'); $('fermerPdf').focus();
+}
+function fermerPdf() { $('fenPdf').hidden = true; document.body.classList.remove('modale'); }
+$('pdf').onclick = ouvrirPdf;
+$('fermerPdf').onclick = fermerPdf;
+$('fenPdf').onclick = function (e) { if (e.target === this) fermerPdf(); };
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('fenPdf').hidden) fermerPdf(); });
+[].forEach.call($('pPer').querySelectorAll('button'), function (b) { b.onclick = function () { PDF.per = b.dataset.per; majPer(); }; });
+[].forEach.call($('pType').querySelectorAll('button'), function (b) { b.onclick = function () { PDF.t = b.dataset.t; chipsPdf('pType', 't', PDF.t); }; });
+$('pTous').onclick = function () { [].forEach.call($('pMois').querySelectorAll('input'), function (i) { i.checked = true; i.parentNode.classList.add('on'); }); majPer(); };
+$('pAucun').onclick = function () { [].forEach.call($('pMois').querySelectorAll('input'), function (i) { i.checked = false; i.parentNode.classList.remove('on'); }); majPer(); };
+$('pGo').onclick = function () {
+  var mois = PDF.per === 'cur' ? [D.label] : moisCoches();
+  if (!mois.length) { $('pEtat').textContent = 'Choisis au moins un mois.'; return; }
+  ecrirePrefPdf();
+  $('pGo').disabled = true; $('pEtat').textContent = 'Création du PDF…'; $('pRes').hidden = true;
+  google.script.run.withSuccessHandler(function (r) {
+    $('pGo').disabled = false; $('pEtat').textContent = '';
+    var bin = atob(r.b64), u = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    PDF.blob = new Blob([u], { type: 'application/pdf' }); PDF.nom = r.nom;
+    $('pNom').textContent = '✓ ' + r.nom; $('pRes').hidden = false;
+    $('pPartager').hidden = !(navigator.canShare && navigator.canShare({ files: [new File([PDF.blob], PDF.nom, { type: 'application/pdf' })] }));
+    $('pRes').scrollIntoView({ block: 'nearest' });
+  }).withFailureHandler(function (e) { $('pGo').disabled = false; $('pEtat').textContent = 'Erreur : ' + (e && e.message ? e.message : e); })
+    .appDecompte({ mois: mois, cours: PDF.t !== 'ent', ent: PDF.t !== 'cours', montants: $('pMont').checked, detail: $('pDet').checked });
+};
+$('pDl').onclick = function () {
+  if (!PDF.blob) return;
+  var a = document.createElement('a'); a.href = URL.createObjectURL(PDF.blob); a.download = PDF.nom;
+  document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+};
+$('pOuvrir').onclick = function () { if (PDF.blob) window.open(URL.createObjectURL(PDF.blob), '_blank', 'noopener'); };
+$('pPartager').onclick = function () {
+  if (!PDF.blob) return;
+  navigator.share({ files: [new File([PDF.blob], PDF.nom, { type: 'application/pdf' })], title: PDF.nom }).catch(function () { });
+};

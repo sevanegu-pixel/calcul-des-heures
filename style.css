@@ -4,7 +4,8 @@ body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--fond);colo
 header{position:sticky;top:0;z-index:5;background:var(--rose);padding:14px 16px 12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .titreL{display:flex;justify-content:space-between;align-items:center}
 .titre{font-size:13px;font-weight:600;color:var(--hdr-t);letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px}
-#reg{border:0;background:transparent;font-size:20px;color:var(--hdr-t);padding:0 4px;margin:-6px 0 2px}
+#reg,#pdf{border:0;background:transparent;font-size:20px;color:var(--hdr-t);padding:0 6px;margin:-6px 0 2px}
+.hbt{display:flex;gap:2px}
 .nav{display:flex;align-items:center;gap:8px}
 .nav button{width:44px;height:44px;border:0;border-radius:12px;background:var(--champ);color:var(--rose-t);font-size:22px;font-weight:700}
 .nav select{flex:1;min-width:0;height:44px;border:0;border-radius:12px;background:var(--champ);font:700 17px Inter,sans-serif;color:var(--txt);text-align:center;text-align-last:center;appearance:none;-webkit-appearance:none}
@@ -115,13 +116,13 @@ button.lien{border:0;background:none;color:var(--pt);font:700 12px Inter,sans-se
 
 /* ---- Fenêtre Paramètres ---- */
 body.modale{overflow:hidden}
-#fenetre{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;background:rgba(20,10,16,.45);animation:fondu .18s ease}
+#fenetre,#fenPdf{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;background:rgba(20,10,16,.45);animation:fondu .18s ease}
 .feuille{width:100%;max-width:560px;max-height:92vh;max-height:92dvh;background:var(--carte);color:var(--txt);border-radius:22px 22px 0 0;display:flex;flex-direction:column;box-shadow:0 -8px 30px rgba(0,0,0,.2);animation:monte .22s ease}
 @media (min-width:640px){#fenetre{align-items:center}.feuille{border-radius:22px;max-height:86vh}}
 .fhead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--ligne)}
 .fhead h2{margin:0;font-size:18px;color:var(--rose-t)}
-#fermer{width:38px;height:38px;border:0;border-radius:50%;background:var(--pt-c);color:var(--txt);font-size:18px;font-weight:700}
-#panneau{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px calc(20px + env(safe-area-inset-bottom));overscroll-behavior:contain}
+#fermer,#fermerPdf{width:38px;height:38px;border:0;border-radius:50%;background:var(--pt-c);color:var(--txt);font-size:18px;font-weight:700}
+#panneau,#corpsPdf{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px calc(20px + env(safe-area-inset-bottom));overscroll-behavior:contain}
 @keyframes fondu{from{opacity:0}}@keyframes monte{from{transform:translateY(40px);opacity:.4}}
 .sect{border:1px solid var(--ligne);border-radius:14px;padding:12px;margin-top:12px}
 .sect:first-child{margin-top:0}
@@ -149,3 +150,15 @@ body.sansPts button.date{cursor:default}
 [data-skin=chapiteau]{--rose:#c8323c;--rose-f:#c8323c;--rose-t:#8e1f28;--fort:#8e1f28;--hdr-t:#fff;--fond:#fff8ee;--ligne:#f1e2cf;--or:#d4a017;--or-c:#fdf3d6;--or-b:#efd890;--or-t:#7d5d00;--pt:#1f5fa8;--pt-t:#163f70;--pt-c:#e4eefa;--pt-b:#bcd2ee;--pt-cc:#f2f7fd}
 [data-skin=lavande]{--rose:#e4dcf6;--rose-f:#7a5cc2;--rose-t:#4a3584;--fort:#5a42a0;--hdr-t:#4a3584;--fond:#f8f6fc;--ligne:#ebe5f5;--pt:#c0558f;--pt-t:#8a2e60;--pt-c:#f9e6f0;--pt-b:#ecc3d8;--pt-cc:#fcf3f8}
 [data-skin=encre]{--rose:#222;--rose-f:#111;--rose-t:#111;--fort:#111;--hdr-t:#fff;--fond:#f4f4f4;--ligne:#e4e4e4;--gris:#777;--vert:#222;--vert-c:#e9e9e9;--pt:#444;--pt-t:#222;--pt-c:#ececec;--pt-b:#d0d0d0;--pt-cc:#f6f6f6;--or:#888;--or-c:#f0f0f0;--or-b:#d6d6d6;--or-t:#444}
+
+/* ---- Décompte PDF ---- */
+#corpsPdf h3{margin:0 0 8px;font-size:15px}
+#corpsPdf .g{font-size:12px;color:var(--gris);margin:0}
+.chips.col{flex-direction:column;align-items:stretch}.chips.col button{text-align:left;border-radius:12px;padding:10px 12px}
+.mois{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:10px}
+.mois label{display:flex;align-items:center;gap:8px;border:1px solid var(--ligne);border-radius:10px;padding:8px 10px;font-size:13px;font-weight:600;background:var(--champ)}
+.mois input{width:18px;height:18px;accent-color:var(--pt);margin:0}
+.mois label.on{border-color:var(--pt);background:var(--pt-cc)}
+#corpsPdf .act button:disabled{opacity:.6}
+.res{background:var(--vert-c);border-color:var(--vert)}.res p{margin:0;font-size:13px;word-break:break-all}
+.res .act{flex-wrap:wrap;justify-content:flex-end}
